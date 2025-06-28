@@ -447,12 +447,6 @@ Cox_braindisease<-merge(Cox_braindisease,MDD,by="eid")
 ##去掉基线患有脑疾病的
 Cox_braindisease<-Cox_braindisease%>%filter(Dementia_days>0&PD_days>0&Stroke_days>0&Epilepsy_days>0&Schizophrenia_days>0&MDD_days>0&Anxiety_days>0&Bipolar_days>0)
 
-###设置对照组不患任何一种脑疾病
-Cox_braindisease_control<-Cox_braindisease%>%filter(Dementia_status==0&PD_status==0&Stroke_status==0&Epilepsy_status==0&Schizophrenia_status==0&MDD_status==0&Anxiety_status==0&Bipolar_status==0)
-Cox_braindisease_case<-Cox_braindisease%>%filter(Dementia_status==1|PD_status==1|Stroke_status==1|Epilepsy_status==1|Schizophrenia_status==1|MDD_status==1|Anxiety_status==1|Bipolar_status==1)
-Cox_braindisease_case[sapply(X=Cox_braindisease_case,FUN='%in%',c(0))]=NA
-Cox_braindisease<-rbind(Cox_braindisease_case,Cox_braindisease_control)
-
 Cox_braindisease<-merge(K_diet_new,Cox_braindisease,by="eid")
 
 Cox_braindisease_male<-Cox_braindisease%>%filter(sex == 1)
@@ -602,26 +596,6 @@ an
 HR<-Predict(fit3, K24h_diet,fun=exp,ref.zero = TRUE)
 #进一步美化#anova=an, pval=T：增加卡方值和P值  
 dd$limits$K24h_diet[2]<-3.573429
-p1<-ggplot(anova=an, pval=T)+  #画曲线  
-  geom_line(data=HR, aes(K24h_diet,yhat),linetype=1,size=1,alpha = 1,colour="#9c331e")+  
-  #画置信区间  
-  geom_ribbon(data=HR, aes(K24h_diet,ymin = lower, ymax = upper),alpha = 0.1,fill="#9c331e")+  
-  #x轴任意刻度：增加一条竖线  
-  #geom_vline(aes(xintercept=2.70), colour="#073E7F", linetype="dashed",size=1)+  
-  #y轴任意刻度：增加一条横线  
-  geom_hline(yintercept=1, linetype=2,size=0.5)+  
-  #去除背景  
-  theme_classic()+  
-  ##增加标签  
-  labs(title = "Major depressive disorder", x="Potassium intake based on diet, g", y="HR (95%CI)")+  
-  ##x轴范围  
-  scale_x_continuous(limits = c(0,10.1),breaks = seq(1,9,1))+ #x轴刻度  seq(30,90,10)函数，#分别是最小值30，最大值90，间距10                                          
-  #y轴范围  
-  scale_y_continuous(limits = c(0.9,3.1),breaks = seq(1,3,0.5))#y轴刻度，seq(0,2,0.5)函数,#分别是最小值0，最大值2，间距0.5                       
-##手动给图上增加标签  
-#geom_text(aes(x=2.8,y=1.0,label='Examined 24-hour urine potassium = 2.70'),            
-#  vjust=2,hjust=0,size=3)   
-p1
 
 ###中介分析，钾和炎症代谢物等的关联
 biochemistry<-fread("gpy.biochemistry.tsv.gz")#fread函数快速读取文件
